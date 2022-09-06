@@ -1,0 +1,18 @@
+{
+  "id": "%ID_placeholder%",
+  "category": {
+    "id": 0,
+    "name": "string"
+  },
+  "name": "%NAME_placeholder%",
+  "photoUrls": [
+    "string"
+  ],
+  "tags": [
+    {
+      "id": 0,
+      "name": "string"
+    }
+  ],
+  "status": "available"
+}
