@@ -1,5 +1,5 @@
 import pytest
-from api.petstore_api import PetstoreApi
+from api.petstore_api import PetStoreApi
 from test_base import TestBase
 from util.constants import Constants
 from util.util import Util
@@ -8,141 +8,158 @@ from util.util import Util
 class TestApi(TestBase):
     @pytest.fixture(scope='class', autouse=True)
     def env_prep(self):
-        global petstore_api
-        petstore_api = PetstoreApi()
-        # random ID
-        global id_pet
-        id_pet = Util.generate_random_int(1000, 9999)
-        global id_order
-        id_order = Util.generate_random_int(1, 10)
-        global quantity
-        quantity = Util.generate_random_int(1, 7)
-        # add name
-        global name_pet
-        name_pet = 'Richie'
+        global pet_store_api
+        pet_store_api = PetStoreApi()
+        global pet_id
+        pet_id = Util.generate_random_int(1000, 9999)
+        global order_id
+        order_id = Util.generate_random_int(1, 10)
+        global pet_quantity
+        pet_quantity = Util.generate_random_int(1, 7)
         global random_status
         random_status = 'test_status_' + str(Util.generate_random_int(100, 200))
 
     def test_create_pet(self):
         # POST
-        open_json = Util.read_json_from_file(Constants.PATH_TO_FILE_ADD_PET)
-        open_json[Constants.KEY_ID] = id_pet
-        open_json[Constants.KEY_NAME] = name_pet
-        response = petstore_api.create_pet(open_json)
+        body_json = Util.read_json_from_file(Constants.PATH_TO_FILE_ADD_PET)
+        body_json[Constants.KEY_ID] = pet_id
+        body_json[Constants.KEY_NAME] = Constants.PET_NAME
+        response = pet_store_api.create_pet(body_json)
 
-        super().check_status_code(response, Constants.CODE_SUCCESS)
+        super().check_status_code_is_ok(response)
 
-        super().check_values_id_and_name_is_equal_expected(response, Constants.KEY_ID, id_pet, Constants.KEY_NAME,
-                                                           name_pet)
+        assert Util.extract_json_field_value(response, Constants.KEY_ID) == pet_id, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_ID)} != {pet_id}'
 
-        super().check_value_key_is_equal_expected_value(response, Constants.KEY_STATUS, Constants.VALUE_KEY_AVAILABLE)
+        assert Util.extract_json_field_value(response, Constants.KEY_NAME) == Constants.PET_NAME, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_NAME)} != {Constants.PET_NAME}'
+
+        assert Util.extract_json_field_value(response, Constants.KEY_STATUS) == Constants.VALUE_KEY_AVAILABLE, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_STATUS)} != {Constants.VALUE_KEY_AVAILABLE}'
 
     def test_find_pet_by_id(self):
-        response = petstore_api.find_pet_by_id(id_pet)
-        print(response.content)
-        print(response.status_code)
+        response = pet_store_api.find_pet_by_id(pet_id)
 
-        super().check_status_code(response, Constants.CODE_SUCCESS)
+        super().check_status_code_is_ok(response)
 
-        super().check_values_id_and_name_is_equal_expected(response, Constants.KEY_ID, id_pet, Constants.KEY_NAME,
-                                                           name_pet)
+        assert Util.extract_json_field_value(response, Constants.KEY_ID) == pet_id, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_ID)} != {pet_id}'
 
-        super().check_value_key_is_equal_expected_value(response, Constants.KEY_STATUS, Constants.VALUE_KEY_AVAILABLE)
+        assert Util.extract_json_field_value(response, Constants.KEY_NAME) == Constants.PET_NAME, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_NAME)} != {Constants.PET_NAME}'
+
+        assert Util.extract_json_field_value(response, Constants.KEY_STATUS) == Constants.VALUE_KEY_AVAILABLE, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_STATUS)} != {Constants.VALUE_KEY_AVAILABLE}'
 
     def test_change_pets_name(self):
-        change_name = {Constants.KEY_NAME: Constants.VALUE_NAME}
+        change_name = {Constants.KEY_NAME: Constants.CHANGED_NAME}
         # POST
-        response = petstore_api.change_pets_name(id_pet, change_name)
+        response = pet_store_api.change_pets_name(pet_id, change_name)
 
-        super().check_status_code(response, Constants.CODE_SUCCESS)
+        super().check_status_code_is_ok(response)
 
-        super().check_int_value_key_is_equal_expected(response, Constants.KEY_MESSAGE, id_pet)
+        assert int(Util.extract_json_field_value(response, Constants.KEY_MESSAGE)) == pet_id, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_MESSAGE)} != {pet_id}'
 
         # GET check changing name
-        response_get = petstore_api.find_pet_by_id(id_pet)
+        response_get = pet_store_api.find_pet_by_id(pet_id)
 
-        super().check_status_code(response_get, Constants.CODE_SUCCESS)
+        super().check_status_code_is_ok(response_get)
 
-        super().check_values_id_and_name_is_equal_expected(response_get, Constants.KEY_ID, id_pet, Constants.KEY_NAME,
-                                                           change_name[Constants.KEY_NAME])
+        assert Util.extract_json_field_value(response_get, Constants.KEY_ID) == pet_id, \
+            f'{Util.extract_json_field_value(response_get, Constants.KEY_ID)} != {pet_id}'
+
+        assert Util.extract_json_field_value(response_get, Constants.KEY_NAME) == change_name[Constants.KEY_NAME], \
+            f'{Util.extract_json_field_value(response_get, Constants.KEY_NAME)} != {change_name[Constants.KEY_NAME]}'
 
     def test_place_an_order(self):
-        open_json = Util.read_json_from_file(Constants.PATH_TO_FILE_PLACE_ORDER)
-        open_json[Constants.KEY_ID] = id_order
-        open_json[Constants.KEY_PET_ID] = id_pet
-        open_json[Constants.KEY_QUANTITY] = quantity
+        body_json = Util.read_json_from_file(Constants.PATH_TO_FILE_PLACE_ORDER)
+        body_json[Constants.KEY_ID] = order_id
+        body_json[Constants.KEY_PET_ID] = pet_id
+        body_json[Constants.KEY_QUANTITY] = pet_quantity
+
         # POST
-        response = petstore_api.place_an_order(open_json)
-        super().check_status_code(response, Constants.CODE_SUCCESS)
+        response = pet_store_api.place_an_order(body_json)
+        super().check_status_code_is_ok(response)
 
-        super().check_value_key_is_equal_expected_value(response, Constants.KEY_ID, id_order)
+        assert Util.extract_json_field_value(response, Constants.KEY_ID) == order_id, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_ID)} != {order_id}'
 
-        super().check_value_key_is_equal_expected_value(response, Constants.KEY_PET_ID, id_pet)
+        assert Util.extract_json_field_value(response, Constants.KEY_PET_ID) == pet_id, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_PET_ID)} != {pet_id}'
 
-        super().check_value_key_is_equal_expected_value(response, Constants.KEY_QUANTITY, quantity)
+        assert Util.extract_json_field_value(response, Constants.KEY_QUANTITY) == pet_quantity, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_QUANTITY)} != {pet_quantity}'
 
     def test_find_making_order(self):
         # GET
-        response = petstore_api.find_making_order(id_order)
+        response = pet_store_api.find_making_order(order_id)
 
-        super().check_status_code(response, Constants.CODE_SUCCESS)
+        super().check_status_code_is_ok(response)
 
-        super().check_value_key_is_equal_expected_value(response, Constants.KEY_ID, id_order)
+        assert Util.extract_json_field_value(response, Constants.KEY_ID) == order_id, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_ID)} != {order_id}'
 
-        super().check_value_key_is_equal_expected_value(response, Constants.KEY_PET_ID, id_pet)
+        assert Util.extract_json_field_value(response, Constants.KEY_PET_ID) == pet_id, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_PET_ID)} != {pet_id}'
 
-        super().check_value_key_is_equal_expected_value(response, Constants.KEY_QUANTITY, quantity)
+        assert Util.extract_json_field_value(response, Constants.KEY_QUANTITY) == pet_quantity, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_QUANTITY)} != {pet_quantity}'
 
-        super().check_value_key_is_equal_expected_value(response, Constants.KEY_STATUS,
-                                                        Constants.VALUE_KEY_STATUS_PLACED)
+        assert Util.extract_json_field_value(response, Constants.KEY_STATUS) == Constants.VALUE_KEY_STATUS_PLACED, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_STATUS)} != {Constants.VALUE_KEY_STATUS_PLACED}'
 
     def test_update_status_of_pet(self):
         status = {Constants.KEY_STATUS: random_status}
         # POST
-        response = petstore_api.update_status_of_pet(id_pet, status)
+        response = pet_store_api.update_status_of_pet(pet_id, status)
 
-        super().check_status_code(response, Constants.CODE_SUCCESS)
+        super().check_status_code_is_ok(response)
 
-        super().check_int_value_key_is_equal_expected(response, Constants.KEY_MESSAGE, id_pet)
+        assert int(Util.extract_json_field_value(response, Constants.KEY_MESSAGE)) == pet_id, \
+            f'{Util.extract_json_field_value(response, Constants.KEY_MESSAGE)} != {pet_id}'
 
         # GET check changing name
-        response_get = petstore_api.find_pet_by_id(id_pet)
+        response_get = pet_store_api.find_pet_by_id(pet_id)
 
-        super().check_status_code(response_get, Constants.CODE_SUCCESS)
+        super().check_status_code_is_ok(response_get)
 
-        super().check_value_key_is_equal_expected_value(response_get, Constants.KEY_ID, id_pet)
+        assert Util.extract_json_field_value(response_get, Constants.KEY_ID) == pet_id, \
+            f'{Util.extract_json_field_value(response_get, Constants.KEY_ID)} != {pet_id}'
 
-        super().check_value_key_is_equal_expected_value(response_get, Constants.KEY_STATUS, random_status)
+        assert Util.extract_json_field_value(response_get, Constants.KEY_STATUS) == random_status, \
+            f'{Util.extract_json_field_value(response_get, Constants.KEY_STATUS)} != {random_status}'
 
     def test_inventory_status(self):
         # GET
-        response = petstore_api.inventory_status()
+        response = pet_store_api.inventory_status()
 
-        super().check_status_code(response, Constants.CODE_SUCCESS)
+        super().check_status_code_is_ok(response)
 
-        super().check_value_key_is_equal_expected_value(response, random_status, Constants.QUANTITY_RANDOM_STATUS)
+        assert Util.extract_json_field_value(response, random_status) == Constants.QUANTITY_RANDOM_STATUS, \
+            f'{Util.extract_json_field_value(response, random_status)} != {Constants.QUANTITY_RANDOM_STATUS}'
 
     def test_delete_order(self):
         # DELETE
-        response = petstore_api.delete_order(id_order)
+        response = pet_store_api.delete_order(order_id)
 
-        super().check_status_code(response, Constants.CODE_SUCCESS)
+        super().check_status_code_is_ok(response)
 
         # GET find order with id_order
-        response_get = petstore_api.find_making_order(id_order)
+        response_get = pet_store_api.find_making_order(order_id)
 
-        super().check_status_code(response_get, Constants.CODE_ERROR)
+        super().check_status_code_is_not_found(response_get)
 
     def test_delete_pet(self):
-        # GET
-        response = petstore_api.delete_pet(id_pet)
+        # DELETE
+        response = pet_store_api.delete_pet(pet_id)
 
-        super().check_status_code(response, Constants.CODE_SUCCESS)
+        super().check_status_code_is_ok(response)
 
         # GET find pet with id
-        response_get = petstore_api.find_pet_by_id(id_pet)
+        response_get = pet_store_api.find_pet_by_id(pet_id)
 
-        super().check_status_code(response_get, Constants.CODE_ERROR)
+        super().check_status_code_is_not_found(response_get)
 
-        super().check_value_key_is_equal_expected_value(response_get, Constants.KEY_MESSAGE,
-                                                        Constants.VALUE_KEY_PET_NOT_FOUND)
+        assert Util.extract_json_field_value(response_get, Constants.KEY_MESSAGE) == Constants.VALUE_KEY_PET_NOT_FOUND, \
+            f'{Util.extract_json_field_value(response_get, Constants.KEY_MESSAGE)} != {Constants.VALUE_KEY_PET_NOT_FOUND}'

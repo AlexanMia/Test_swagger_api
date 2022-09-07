@@ -1,44 +1,60 @@
 import requests
 
 
-class PetstoreApi:
+class PetStoreApi:
     BASE_URL = 'https://petstore.swagger.io/v2'
-    end_point_pet_url = BASE_URL + '/pet'
-    end_point_store_order_url = BASE_URL + '/store/order'
-    end_point_store_inventory_url = BASE_URL + '/store/inventory'
+    END_POINT_PET_URL = BASE_URL + '/pet/'
+    END_POINT_STORE_ORDER_URL = BASE_URL + '/store/order/'
+    END_POINT_STORE_INVENTORY_URL = BASE_URL + '/store/inventory'
 
-    def create_pet(self, json):
+    @staticmethod
+    def post_with_body(endpoint, json):
+        return requests.post(endpoint, json=json)
+
+    @staticmethod
+    def post_with_param(endpoint, param):
+        return requests.post(endpoint, data=param)
+
+    @staticmethod
+    def get(endpoint):
+        return requests.get(endpoint)
+
+    @staticmethod
+    def delete(endpoint):
+        return requests.delete(endpoint)
+
+    def create_pet(self, body):
         # make request POST with json file
-        return requests.post(f'{self.end_point_pet_url}', json=json)
+        return self.post_with_body(self.END_POINT_PET_URL, body)
 
     def find_pet_by_id(self, id_pet):
         # make request GET with end point id_pet
-        return requests.get(f'{self.end_point_pet_url}/{id_pet}')
+        return self.get(f'{self.END_POINT_PET_URL}{id_pet}')
 
     def change_pets_name(self, id_pet, param):
         # make request POST with data
-        return requests.post(f'{self.end_point_pet_url}/{id_pet}', data=param)
+        return self.post_with_param(f'{self.END_POINT_PET_URL}{id_pet}', param)
 
-    def place_an_order(self, json):
+    def place_an_order(self, body):
         # make request POST with json file
-        return requests.post(f'{self.end_point_store_order_url}', json=json)
+        return self.post_with_body(f'{self.END_POINT_STORE_ORDER_URL}', body)
 
     def find_making_order(self, id_order):
         # make request GET with end point id_order
-        return requests.get(f'{self.end_point_store_order_url}/{id_order}')
+        return self.get(f'{self.END_POINT_STORE_ORDER_URL}{id_order}')
 
     def update_status_of_pet(self, id_pet, param):
         # make request POST with data, id_pet
-        return requests.post(f'{self.end_point_pet_url}/{id_pet}', data=param)
+        return self.post_with_param(f'{self.END_POINT_PET_URL}{id_pet}', param)
 
     def inventory_status(self):
         # GET
-        return requests.get(f'{self.end_point_store_inventory_url}')
+        return self.get(f'{self.END_POINT_STORE_INVENTORY_URL}')
 
     def delete_order(self, id_order):
         # DELETE with id_order
-        return requests.delete(f'{self.end_point_store_order_url}/{id_order}')
+        return self.delete(f'{self.END_POINT_STORE_ORDER_URL}{id_order}')
 
     def delete_pet(self, id_pet):
         # DELETE with id_pet
-        return requests.delete(f'{self.end_point_pet_url}/{id_pet}')
+        return self.delete(f'{self.END_POINT_PET_URL}{id_pet}')
