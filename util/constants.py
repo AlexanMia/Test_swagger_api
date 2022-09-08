@@ -8,10 +8,10 @@ class Constants:
     KEY_ID = 'id'
     KEY_NAME = 'name'
     PET_NAME = 'Richie'
-    CHANGED_NAME = 'Crispy'
+    CHANGED_PET_NAME = 'Crispy'
     KEY_PET_ID = 'petId'
     KEY_QUANTITY = 'quantity'
     KEY_STATUS = 'status'
     VALUE_KEY_STATUS_PLACED = "placed"
     VALUE_KEY_PET_NOT_FOUND = 'Pet not found'
-    QUANTITY_RANDOM_STATUS = 1
+    QUANTITY_OF_RANDOM_STATUS = 1

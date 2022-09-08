@@ -31,7 +31,7 @@ class PetStoreApi:
         # make request GET with end point id_pet
         return self.get(f'{self.END_POINT_PET_URL}{id_pet}')
 
-    def change_pets_name(self, id_pet, param):
+    def change_pet_name(self, id_pet, param):
         # make request POST with data
         return self.post_with_param(f'{self.END_POINT_PET_URL}{id_pet}', param)
 
@@ -39,15 +39,15 @@ class PetStoreApi:
         # make request POST with json file
         return self.post_with_body(f'{self.END_POINT_STORE_ORDER_URL}', body)
 
-    def find_making_order(self, id_order):
+    def find_order(self, id_order):
         # make request GET with end point id_order
         return self.get(f'{self.END_POINT_STORE_ORDER_URL}{id_order}')
 
-    def update_status_of_pet(self, id_pet, param):
+    def update_pet_status(self, id_pet, param):
         # make request POST with data, id_pet
         return self.post_with_param(f'{self.END_POINT_PET_URL}{id_pet}', param)
 
-    def inventory_status(self):
+    def get_inventory_statuses(self):
         # GET
         return self.get(f'{self.END_POINT_STORE_INVENTORY_URL}')
 

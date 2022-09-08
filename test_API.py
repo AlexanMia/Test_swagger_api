@@ -1,4 +1,5 @@
 import pytest
+
 from api.petstore_api import PetStoreApi
 from test_base import TestBase
 from util.constants import Constants
@@ -52,9 +53,9 @@ class TestApi(TestBase):
             f'{Util.extract_json_field_value(response, Constants.KEY_STATUS)} != {Constants.VALUE_KEY_AVAILABLE}'
 
     def test_change_pets_name(self):
-        change_name = {Constants.KEY_NAME: Constants.CHANGED_NAME}
+        change_name = {Constants.KEY_NAME: Constants.CHANGED_PET_NAME}
         # POST
-        response = pet_store_api.change_pets_name(pet_id, change_name)
+        response = pet_store_api.change_pet_name(pet_id, change_name)
 
         super().check_status_code_is_ok(response)
 
@@ -69,8 +70,8 @@ class TestApi(TestBase):
         assert Util.extract_json_field_value(response_get, Constants.KEY_ID) == pet_id, \
             f'{Util.extract_json_field_value(response_get, Constants.KEY_ID)} != {pet_id}'
 
-        assert Util.extract_json_field_value(response_get, Constants.KEY_NAME) == change_name[Constants.KEY_NAME], \
-            f'{Util.extract_json_field_value(response_get, Constants.KEY_NAME)} != {change_name[Constants.KEY_NAME]}'
+        assert Util.extract_json_field_value(response_get, Constants.KEY_NAME) == Constants.CHANGED_PET_NAME, \
+            f'{Util.extract_json_field_value(response_get, Constants.KEY_NAME)} != {Constants.CHANGED_PET_NAME}'
 
     def test_place_an_order(self):
         body_json = Util.read_json_from_file(Constants.PATH_TO_FILE_PLACE_ORDER)
@@ -93,7 +94,7 @@ class TestApi(TestBase):
 
     def test_find_making_order(self):
         # GET
-        response = pet_store_api.find_making_order(order_id)
+        response = pet_store_api.find_order(order_id)
 
         super().check_status_code_is_ok(response)
 
@@ -112,7 +113,7 @@ class TestApi(TestBase):
     def test_update_status_of_pet(self):
         status = {Constants.KEY_STATUS: random_status}
         # POST
-        response = pet_store_api.update_status_of_pet(pet_id, status)
+        response = pet_store_api.update_pet_status(pet_id, status)
 
         super().check_status_code_is_ok(response)
 
@@ -132,12 +133,12 @@ class TestApi(TestBase):
 
     def test_inventory_status(self):
         # GET
-        response = pet_store_api.inventory_status()
+        response = pet_store_api.get_inventory_statuses()
 
         super().check_status_code_is_ok(response)
 
-        assert Util.extract_json_field_value(response, random_status) == Constants.QUANTITY_RANDOM_STATUS, \
-            f'{Util.extract_json_field_value(response, random_status)} != {Constants.QUANTITY_RANDOM_STATUS}'
+        assert Util.extract_json_field_value(response, random_status) == Constants.QUANTITY_OF_RANDOM_STATUS, \
+            f'{Util.extract_json_field_value(response, random_status)} != {Constants.QUANTITY_OF_RANDOM_STATUS}'
 
     def test_delete_order(self):
         # DELETE
@@ -146,7 +147,7 @@ class TestApi(TestBase):
         super().check_status_code_is_ok(response)
 
         # GET find order with id_order
-        response_get = pet_store_api.find_making_order(order_id)
+        response_get = pet_store_api.find_order(order_id)
 
         super().check_status_code_is_not_found(response_get)
 
