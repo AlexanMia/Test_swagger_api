@@ -5,7 +5,7 @@ Resource: https://petstore.swagger.io/#/
 
 Tests are implemented:
 
-One suit has steps:
+One suite has steps:
 
 - creating pet
 - finding pet by id
