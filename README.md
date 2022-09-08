@@ -3,9 +3,7 @@ Test project
 
 Resource: https://petstore.swagger.io/#/
 
-Tests are implemented:
-
-One suite has steps:
+Test steps:
 
 - creating pet
 - finding pet by id
