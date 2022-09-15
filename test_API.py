@@ -13,10 +13,8 @@ class TestApi(TestBase):
         pet_store_api = PetStoreApi()
         global pet_id
         pet_id = Util.generate_random_int(1000, 9999)
-        print(pet_id)
         global order_id
         order_id = Util.generate_random_int(1, 10)
-        print(order_id)
         global pet_quantity
         pet_quantity = Util.generate_random_int(1, 7)
         global random_status
