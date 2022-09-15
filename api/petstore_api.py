@@ -1,4 +1,8 @@
 import requests
+from jsonschema import validate
+
+from schemas.schemas import Schemas
+from util.constants import Constants
 
 
 class PetStoreApi:
@@ -6,6 +10,10 @@ class PetStoreApi:
     END_POINT_PET_URL = BASE_URL + '/pet/'
     END_POINT_STORE_ORDER_URL = BASE_URL + '/store/order/'
     END_POINT_STORE_INVENTORY_URL = BASE_URL + '/store/inventory'
+
+    @staticmethod
+    def validate_schema_json(response, schema):
+        return validate(instance=response.json(), schema=schema)
 
     @staticmethod
     def post_with_body(endpoint, json):
@@ -25,23 +33,39 @@ class PetStoreApi:
 
     def create_pet(self, body):
         # make request POST with json file
-        return self.post_with_body(self.END_POINT_PET_URL, body)
+        response = self.post_with_body(self.END_POINT_PET_URL, body)
+        self.validate_schema_json(response, Schemas.CREATED_PET_SCHEMAS)
+        return response
 
     def find_pet_by_id(self, id_pet):
         # make request GET with end point id_pet
-        return self.get(f'{self.END_POINT_PET_URL}{id_pet}')
+        response = self.get(f'{self.END_POINT_PET_URL}{id_pet}')
+        if response.status_code == Constants.CODE_SUCCESS:
+            self.validate_schema_json(response, Schemas.CREATED_PET_SCHEMAS)
+        elif response.status_code == Constants.CODE_IS_NOT_FOUND:
+            self.validate_schema_json(response, Schemas.COMMON_INFO_ABOUT_ACTIONS_SCHEMAS)
+        return response
 
     def change_pet_name(self, id_pet, param):
         # make request POST with data
-        return self.post_with_param(f'{self.END_POINT_PET_URL}{id_pet}', param)
+        response = self.post_with_param(f'{self.END_POINT_PET_URL}{id_pet}', param)
+        self.validate_schema_json(response, Schemas.COMMON_INFO_ABOUT_ACTIONS_SCHEMAS)
+        return response
 
     def place_an_order(self, body):
         # make request POST with json file
-        return self.post_with_body(f'{self.END_POINT_STORE_ORDER_URL}', body)
+        response = self.post_with_body(f'{self.END_POINT_STORE_ORDER_URL}', body)
+        self.validate_schema_json(response, Schemas.PLACE_AN_ORDER_SCHEMAS)
+        return response
 
     def find_order(self, id_order):
         # make request GET with end point id_order
-        return self.get(f'{self.END_POINT_STORE_ORDER_URL}{id_order}')
+        response = self.get(f'{self.END_POINT_STORE_ORDER_URL}{id_order}')
+        if response.status_code == Constants.CODE_SUCCESS:
+            self.validate_schema_json(response, Schemas.PLACE_AN_ORDER_SCHEMAS)
+        elif response.status_code == Constants.CODE_IS_NOT_FOUND:
+            self.validate_schema_json(response, Schemas.COMMON_INFO_ABOUT_ACTIONS_SCHEMAS)
+        return response
 
     def update_pet_status(self, id_pet, param):
         # make request POST with data, id_pet
@@ -49,12 +73,18 @@ class PetStoreApi:
 
     def get_inventory_statuses(self):
         # GET
-        return self.get(f'{self.END_POINT_STORE_INVENTORY_URL}')
+        response = self.get(f'{self.END_POINT_STORE_INVENTORY_URL}')
+        self.validate_schema_json(response, Schemas.AVAILABLE_STATUS_SCHEMA)
+        return response
 
     def delete_order(self, id_order):
         # DELETE with id_order
-        return self.delete(f'{self.END_POINT_STORE_ORDER_URL}{id_order}')
+        response = self.delete(f'{self.END_POINT_STORE_ORDER_URL}{id_order}')
+        self.validate_schema_json(response, Schemas.COMMON_INFO_ABOUT_ACTIONS_SCHEMAS)
+        return response
 
     def delete_pet(self, id_pet):
         # DELETE with id_pet
-        return self.delete(f'{self.END_POINT_PET_URL}{id_pet}')
+        response = self.delete(f'{self.END_POINT_PET_URL}{id_pet}')
+        self.validate_schema_json(response, Schemas.COMMON_INFO_ABOUT_ACTIONS_SCHEMAS)
+        return response
